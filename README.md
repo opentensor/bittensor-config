@@ -13,5 +13,3 @@ gh repo clone opentensor/bittensor-config
 cd bittensor-config
 pip install -e .
 ```
-
-
