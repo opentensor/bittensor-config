@@ -1,18 +1,17 @@
 #!/bin/bash
 
 #
-# In this script you are going to find the process of releasing bittensor.
+# In this script you are going to find the process of releasing bittensor_config.
 #
 # This script needs:
 #   - An existing VERSION file
 #   - Version in VERSION file is not a git tag already
 #
 # This process will generate:
-#   - Tag in Github repo: https://github.com/opentensor/bittensor/tags
-#   - Release in Github: https://github.com/opentensor/bittensor/releases
+#   - Tag in Github repo: https://github.com/opentensor/bittensor-config/tags
+#   - Release in Github: https://github.com/opentensor/bittensor-config/releases
 #   - New entry in CHANGELOG.md file
-#   - Python wheel in pypi: https://pypi.org/project/bittensor/
-#   - Docker image in dockerhub: https://hub.docker.com/r/opentensorfdn/bittensor/tags (TODO)
+#   - Python wheel in pypi: https://pypi.org/project/bittensor-config/
 #
 
 ###
@@ -41,11 +40,11 @@ function help(){
 # 0. Check requirements
 # Expected state for the execution environment
 #  - VERSION file exists
-#  - __version__ exists inside file 'bittensor/__init__.py'
+#  - __version__ exists inside file 'bittensor_config/__init__.py'
 #  - Both versions have the expected format and are the same
 
 VERSION_FILENAME='VERSION'
-CODE_WITH_VERSION='bittensor/__init__.py'
+CODE_WITH_VERSION='bittensor_config/__init__.py'
 
 if [[ ! -f $VERSION_FILENAME ]]; then
   echo_error "Requirement failure: $VERSION_FILENAME does not exist"
@@ -53,7 +52,7 @@ if [[ ! -f $VERSION_FILENAME ]]; then
   exit 1
 fi
 
-CODE_VERSION=`grep '__version__\ \=\ ' $CODE_WITH_VERSION | awk '{print $3}' | sed "s/'//g"`
+CODE_VERSION=`grep '__version__\ \=\ ' $CODE_WITH_VERSION | awk '{print $3}' | sed "s/'//g" | sed 's/"//g'`
 VERSION=$(cat $VERSION_FILENAME)
 
 if ! [[ "$CODE_VERSION" =~ ^[0-9]+.[0-9]+.[0-9]+$ ]];then
@@ -146,8 +145,3 @@ fi
 # 4. Generate python wheel and upload it to Pypi
 echo_info "Releasing pip package"
 ${BASH_SOURCE%/*}/release_pip.sh $APPLY_ACTION
-
-# 5. Creating docker image and upload
-echo_info "Releasing docker image"
-${BASH_SOURCE%/*}/release_docker.sh $APPLY_ACTION --version $VERSION
-
